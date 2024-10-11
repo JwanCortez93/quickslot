@@ -8,6 +8,7 @@ import { z } from "zod";
 import CustomFormField from "../CustomFormField";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
+import { createEvent } from "@/server/actions/events";
 
 const EventForm = () => {
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -18,8 +19,13 @@ const EventForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof eventFormSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
+    const data = await createEvent(values);
+    if (data?.error) {
+      form.setError("root", {
+        message: "There was an error saving your event",
+      });
+    }
   };
 
   return (
@@ -28,6 +34,11 @@ const EventForm = () => {
         className="flex flex-col gap-6"
         onSubmit={form.handleSubmit(onSubmit)}
       >
+        {form.formState.errors.root && (
+          <div className="text-destructive text-sm">
+            {form.formState.errors.root.message}
+          </div>
+        )}
         <CustomFormField
           control={form.control}
           name="name"
