@@ -9,8 +9,10 @@ import CustomFormField from "../CustomFormField";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import { createEvent } from "@/server/actions/events";
+import { useState } from "react";
 
 const EventForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
@@ -20,11 +22,19 @@ const EventForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
-    const data = await createEvent(values);
-    if (data?.error) {
-      form.setError("root", {
-        message: "There was an error saving your event",
-      });
+    setIsLoading(true);
+    try {
+      const data = await createEvent(values);
+
+      if (data?.error) {
+        form.setError("root", {
+          message: "There was an error saving your event",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -68,10 +78,12 @@ const EventForm = () => {
         />
 
         <div className="flex gap-2 justify-end">
-          <Button type="button" asChild variant="outline">
+          <Button disabled={isLoading} type="button" asChild variant="outline">
             <Link href="/events">Cancel</Link>
           </Button>
-          <Button type="submit">Save</Button>
+          <Button disabled={isLoading} type="submit">
+            {isLoading ? "Saving" : "Save"}
+          </Button>
         </div>
       </form>
     </Form>
