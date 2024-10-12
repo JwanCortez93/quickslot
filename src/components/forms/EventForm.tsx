@@ -1,30 +1,54 @@
 "use client";
 
 import { eventFormSchema } from "@/schema/events";
+import { createEvent, deleteEvent, updateEvent } from "@/server/actions/events";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {} from "@radix-ui/react-alert-dialog";
 import Link from "next/link";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import CustomFormField from "../CustomFormField";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
-import { createEvent } from "@/server/actions/events";
-import { useState } from "react";
 
-const EventForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
+const EventForm = ({
+  event,
+}: {
+  event?: {
+    id: string;
+    name: string;
+    description?: string;
+    durationInMinutes: number;
+    isActive: boolean;
+  };
+}) => {
+  const [isDeletePending, startDeletion] = useTransition();
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
-    defaultValues: {
+    defaultValues: event ?? {
       isActive: true,
       durationInMinutes: 30,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
-    setIsLoading(true);
+    const action =
+      event == null ? createEvent : updateEvent.bind(null, event.id);
+
     try {
-      const data = await createEvent(values);
+      const data = await action(values);
 
       if (data?.error) {
         form.setError("root", {
@@ -33,8 +57,6 @@ const EventForm = () => {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -78,11 +100,57 @@ const EventForm = () => {
         />
 
         <div className="flex gap-2 justify-end">
-          <Button disabled={isLoading} type="button" asChild variant="outline">
+          {event && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={form.formState.isSubmitting || isDeletePending}
+                  type="button"
+                  variant={"destructiveGhost"}
+                >
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This cannot be undone, it will delete your event forever.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={form.formState.isSubmitting || isDeletePending}
+                    variant="destructive"
+                    onClick={() => {
+                      startDeletion(async () => {
+                        const data = await deleteEvent(event.id);
+
+                        if (data?.error) {
+                          form.setError("root", {
+                            message: "There was an error deleting your event",
+                          });
+                        }
+                      });
+                    }}
+                  >
+                    Confirm
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <Button
+            disabled={form.formState.isSubmitting}
+            type="button"
+            asChild
+            variant="outline"
+          >
             <Link href="/events">Cancel</Link>
           </Button>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Saving" : "Save"}
+          <Button disabled={form.formState.isSubmitting} type="submit">
+            {form.formState.isSubmitting ? "Saving" : "Save"}
           </Button>
         </div>
       </form>
