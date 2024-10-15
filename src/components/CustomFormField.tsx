@@ -18,7 +18,7 @@ interface CustomFormFieldProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
-  description: string;
+  description?: string;
   type?: "input" | "textarea" | "switch" | "number";
 }
 
@@ -57,7 +57,7 @@ const CustomFormField = <T extends FieldValues>({
               )
             )}
           </FormControl>
-          <FormDescription>{description}</FormDescription>
+          {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}

@@ -8,6 +8,13 @@
       "when": 1728635295127,
       "tag": "0000_brainy_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1729032553938,
+      "tag": "0001_blue_titanium_man",
+      "breakpoints": true
     }
   ]
 }

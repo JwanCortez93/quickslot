@@ -3,9 +3,9 @@
 import { eventFormSchema } from "@/schema/events";
 import { createEvent, deleteEvent, updateEvent } from "@/server/actions/events";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {} from "@radix-ui/react-alert-dialog";
+
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import CustomFormField from "../CustomFormField";
@@ -142,14 +142,17 @@ const EventForm = ({
             </AlertDialog>
           )}
           <Button
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || isDeletePending}
             type="button"
             asChild
             variant="outline"
           >
             <Link href="/events">Cancel</Link>
           </Button>
-          <Button disabled={form.formState.isSubmitting} type="submit">
+          <Button
+            disabled={form.formState.isSubmitting || isDeletePending}
+            type="submit"
+          >
             {form.formState.isSubmitting ? "Saving" : "Save"}
           </Button>
         </div>
