@@ -1,5 +1,5 @@
-const BookPage = () => {
-  return <div>BookPage</div>;
+const BookEventPage = () => {
+  return <div>BookEventPage</div>;
 };
 
-export default BookPage;
+export default BookEventPage;
