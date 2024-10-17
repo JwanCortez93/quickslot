@@ -19,7 +19,7 @@ interface CustomFormFieldProps<T extends FieldValues> {
   name: Path<T>;
   label: string;
   description?: string;
-  type?: "input" | "textarea" | "switch" | "number";
+  type?: "input" | "textarea" | "switch" | "number" | "email";
 }
 
 const CustomFormField = <T extends FieldValues>({
@@ -47,17 +47,29 @@ const CustomFormField = <T extends FieldValues>({
           </div>
           <FormControl>
             {type === "textarea" ? (
-              <Textarea {...field} className="resize-none h-32" />
+              <Textarea
+                {...field}
+                className="resize-none h-32"
+                placeholder={description}
+              />
             ) : (
               type !== "switch" && (
                 <Input
                   {...field}
-                  type={type === "number" ? "number" : "text"}
+                  type={
+                    type === "number"
+                      ? "number"
+                      : type === "email"
+                      ? "email"
+                      : "text"
+                  }
                 />
               )
             )}
           </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
+          {description && type !== "textarea" && (
+            <FormDescription>{description}</FormDescription>
+          )}
           <FormMessage />
         </FormItem>
       )}
