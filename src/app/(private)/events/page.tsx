@@ -1,3 +1,4 @@
+import CopyCatalogButton from "@/components/CopyCatalogButton";
 import CopyEventButton from "@/components/CopyEventButton";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,16 +30,19 @@ const EventsPage = async () => {
 
   return (
     <>
-      <div className="flex gap-4 items-baseline">
-        <h1 className="text-3xl lg:text-4xl xl:text-5xl font-semibold mb-6">
-          Events
-        </h1>
-        <Button asChild>
-          <Link href="/events/new">
-            <CalendarPlus className="mr-4 size-6" />
-            New Event
-          </Link>
-        </Button>
+      <div className="flex items-baseline justify-between">
+        <div className="flex gap-4">
+          <h1 className="text-3xl lg:text-4xl xl:text-5xl font-semibold mb-6">
+            Events
+          </h1>
+          <Button asChild>
+            <Link href="/events/new">
+              <CalendarPlus className="mr-4 size-6" />
+              New Event
+            </Link>
+          </Button>
+        </div>
+        <CopyCatalogButton variant="outline" clerkUserId={userId} />
       </div>
       {events.length > 0 ? (
         <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(400px,1fr))]">
